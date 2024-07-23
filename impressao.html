@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pesquisa de CNPJ para Contrato</title>
+  <script src="scriptImpressao.js" defer></script>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+
+<body>
+  
+  <h1>Primeiro HTML</h1>
+  <h2 id="cnpjPesq">Pesquisa CNPJ</h2>
+  <label for="cnpjLabel">CNPJ:</label>
+  <input type="text" id="cnpj" placeholder="Digite o CNPJ"/>
+  <h2 id="cepPesq">CEP</h2>
+  <label for="cepLabel">CEP:</label>
+  <input type="text" id="cep" placeholder="Digite o CEP"/>
+  
+  <button id="botaoImpressaoCnpj">Enviar</button>
+  <button id="botaoVoltarIndexImpressao">Voltar</button>
+  
+  <br><br>
+  
+  <div id="result"></div>
+  <table id="data-table" style="display: none;">
+    <tbody id="table-body">
+      <tr>
+        <th>CNPJ</th>
+        <td id="cnpj-td"></td>
+      </tr>
+      <tr>
+        <th>Razão Social</th>
+        <td id="razao-social-td"></td>
+      </tr>
+      <tr>
+        <th>Endereço</th>
+        <td id="endereco-td"></td>
+      </tr>
+      <tr>
+        <th>Telefone</th>
+        <td id="telefone-td"></td>
+      </tr>
+      <tr>
+        <th>CEP</th>
+        <td id="cep-td"></td>
+      </tr>
+    </tbody>
+  </table>
+  
+</body>
+
+</html>
