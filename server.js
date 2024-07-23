@@ -1,35 +1,53 @@
-// server.js
-const express = require('express');
-const https = require('https');
-const app = express();
-const PORT = process.env.PORT || 3000;
+const botaoImpressaoCnpj = document.querySelector("#botaoImpressaoCnpj");
+const entradaDoCnpj = document.querySelector("#cnpj"); // Captura o valor do input CNPJ
+const entradaDoCep = document.querySelector("#cep"); // Captura o valor do input CEP
 
-app.get('/proxy/cnpj/:cnpj', (req, res) => {
-  const cnpj = req.params.cnpj;
-  const options = {
-    hostname: 'receitaws.com.br',
-    path: `/v1/cnpj/${cnpj}`,
-    method: 'GET',
-    headers: {
-      Accept: 'application/json'
+botaoImpressaoCnpj.addEventListener("click", async function() {
+  const cnpjDigitado = entradaDoCnpj.value;
+  const cepDigitado = entradaDoCep.value;
+
+  console.log(`CNPJ: ${cnpjDigitado}`);
+  console.log(`CEP: ${cepDigitado}`);
+
+  try {
+    // Buscar dados do CNPJ usando o proxy
+    let cnpjUrl = `/proxy/${cnpjDigitado}`;
+    let cnpjResponse = await fetch(cnpjUrl);
+    let cnpjData = await cnpjResponse.json();
+
+    // Verifica se a resposta contém um erro
+    if (cnpjData.status === "ERROR") {
+      throw new Error("CNPJ não encontrado");
     }
-  };
 
-  https.request(options, (apiRes) => {
-    let data = '';
+    const razaoSocial = cnpjData.nome;
+    const telefone = cnpjData.telefone;
+    const enderecoCompleto = `${cnpjData.logradouro}, ${cnpjData.numero}, ${cnpjData.bairro}, ${cnpjData.municipio} - ${cnpjData.uf}, ${cnpjData.cep}`;
 
-    apiRes.on('data', (chunk) => {
-      data += chunk;
-    });
+    // Buscar dados do CEP na API ViaCEP
+    let cepUrl = `https://viacep.com.br/ws/${cepDigitado}/json/`;
+    let cepResponse = await fetch(cepUrl);
+    let cepData = await cepResponse.json();
 
-    apiRes.on('end', () => {
-      res.send(JSON.parse(data));
-    });
-  }).end();
-});
+    if (cepData.erro) {
+      throw new Error("CEP não encontrado");
+    }
 
-app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
+    const enderecoCep = `${cepData.logradouro}, ${cepData.bairro}, ${cepData.localidade} - ${cepData.uf}`;
+
+    // Preenchendo as células da tabela com os valores
+    document.getElementById('cnpj-td').textContent = cnpjDigitado;
+    document.getElementById('razao-social-td').textContent = razaoSocial;
+    document.getElementById('endereco-td').textContent = enderecoCep; // Preferimos usar o endereço retornado pelo CEP
+    document.getElementById('telefone-td').textContent = telefone;
+    document.getElementById('cep-td').textContent = cepDigitado;
+
+    // Exibindo a tabela
+    document.getElementById('data-table').style.display = 'block';
+  } catch (error) {
+    console.error(error);
+    alert(`Erro ao buscar informações: ${error.message}`);
+  }
 });
 
 
