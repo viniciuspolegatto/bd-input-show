@@ -1,82 +1,79 @@
-const botaoImpressaoCnpj = document.querySelector("#botaoImpressaoCnpj");
-const entradaDoCnpj = document.querySelector("#cnpj"); // Captura o valor do input CNPJ
-const entradaDoCep = document.querySelector("#cep"); // Captura o valor do input CEP
+const express = require('express');
+const mysql = require('mysql2');
+const bodyParser = require('body-parser');
+require('dotenv').config();
 
-botaoImpressaoCnpj.addEventListener("click", async function() {
-  const cnpjDigitado = entradaDoCnpj.value;
-  const cepDigitado = entradaDoCep.value;
+const app = express();
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(express.static('public'));
 
-  console.log(`CNPJ: ${cnpjDigitado}`);
-  console.log(`CEP: ${cepDigitado}`);
-
-  try {
-    // Buscar dados do CNPJ usando o proxy
-    let cnpjUrl = `/proxy/${cnpjDigitado}`;
-    let cnpjResponse = await fetch(cnpjUrl);
-    let cnpjData = await cnpjResponse.json();
-
-    // Verifica se a resposta contém um erro
-    if (cnpjData.status === "ERROR") {
-      throw new Error("CNPJ não encontrado");
-    }
-
-    const razaoSocial = cnpjData.nome;
-    const telefone = cnpjData.telefone;
-    const enderecoCompleto = `${cnpjData.logradouro}, ${cnpjData.numero}, ${cnpjData.bairro}, ${cnpjData.municipio} - ${cnpjData.uf}, ${cnpjData.cep}`;
-
-    // Buscar dados do CEP na API ViaCEP
-    let cepUrl = `https://viacep.com.br/ws/${cepDigitado}/json/`;
-    let cepResponse = await fetch(cepUrl);
-    let cepData = await cepResponse.json();
-
-    if (cepData.erro) {
-      throw new Error("CEP não encontrado");
-    }
-
-    const enderecoCep = `${cepData.logradouro}, ${cepData.bairro}, ${cepData.localidade} - ${cepData.uf}`;
-
-    // Preenchendo as células da tabela com os valores
-    document.getElementById('cnpj-td').textContent = cnpjDigitado;
-    document.getElementById('razao-social-td').textContent = razaoSocial;
-    document.getElementById('endereco-td').textContent = enderecoCep; // Preferimos usar o endereço retornado pelo CEP
-    document.getElementById('telefone-td').textContent = telefone;
-    document.getElementById('cep-td').textContent = cepDigitado;
-
-    // Exibindo a tabela
-    document.getElementById('data-table').style.display = 'block';
-  } catch (error) {
-    console.error(error);
-    alert(`Erro ao buscar informações: ${error.message}`);
-  }
+// Configuração do banco de dados
+const connection = mysql.createConnection({
+  host: process.env.MYSQL_HOST,
+  user: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASS,
+  database: process.env.MYSQL_DB
 });
 
+connection.connect(err => {
+  if (err) throw err;
+  console.log('Conectado ao banco de dados');
+});
 
-
-/*
-const http = require('https');
-
-const options = {
-  method: 'GET',
-  hostname: 'receitaws.com.br',
-  port: null,
-  path: '/v1/cnpj/29735567000198',
-  headers: {
-    Accept: 'application/json'
-  }
-};
-
-const req = http.request(options, function (res) {
-  const chunks = [];
-
-  res.on('data', function (chunk) {
-    chunks.push(chunk);
-  });
-
-  res.on('end', function () {
-    const body = Buffer.concat(chunks);
-    console.log(body.toString());
+// Rota para adicionar um novo cadastro
+app.post('/add', (req, res) => {
+  const { email, cpf, nome } = req.body;
+  const query = 'INSERT INTO CADASTRO (email, cpf, nome) VALUES (?, ?, ?)';
+  connection.query(query, [email, cpf, nome], (err, result) => {
+    if (err) throw err;
+    res.redirect('/search.html');
   });
 });
 
-req.end();
-*/
+// Rota para buscar um cadastro por CPF
+app.post('/search', (req, res) => {
+  const { cpf } = req.body;
+  const query = 'SELECT * FROM CADASTRO WHERE cpf = ?';
+  connection.query(query, [cpf], (err, results) => {
+    if (err) throw err;
+    if (results.length > 0) {
+      res.redirect(`/results.html?cpf=${cpf}`);
+    } else {
+      res.send('<script>alert("CPF NÃO ENCONTRADO, FAVOR CADASTRAR");window.location.href="/search.html";</script>');
+    }
+  });
+});
+
+// Rota para buscar todos os cadastros
+app.get('/all', (req, res) => {
+  const query = 'SELECT * FROM CADASTRO LIMIT 10';
+  connection.query(query, (err, results) => {
+    if (err) throw err;
+    res.json(results);
+  });
+});
+
+// Rota para obter dados de um CPF específico
+app.get('/details', (req, res) => {
+  const { cpf } = req.query;
+  const query = 'SELECT * FROM CADASTRO WHERE cpf = ?';
+  connection.query(query, [cpf], (err, results) => {
+    if (err) throw err;
+    res.json(results);
+  });
+});
+
+// Rota para excluir um cadastro por CPF
+app.post('/delete', (req, res) => {
+  const { cpf } = req.body;
+  const query = 'DELETE FROM CADASTRO WHERE cpf = ?';
+  connection.query(query, [cpf], (err, result) => {
+    if (err) throw err;
+    res.redirect('/search.html');
+  });
+});
+
+app.listen(3000, () => {
+  console.log('Servidor rodando na porta 3000');
+});

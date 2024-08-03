@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalhes do Cadastro</title>
+</head>
+<body>
+  <h1>Detalhes do Cadastro</h1>
+  <div id="details"></div>
+  <form action="/delete" method="POST">
+    <input type="hidden" id="cpf" name="cpf">
+    <button type="submit">Excluir Cadastro</button>
+  </form>
+  <a href="/search.html">Voltar</a>
+  <script>
+    async function loadDetails() {
+      const params = new URLSearchParams(window.location.search);
+      const cpf = params.get('cpf');
+      const response = await fetch(`/details?cpf=${cpf}`);
+      const [details] = await response.json();
+      const detailsDiv = document.getElementById('details');
+      detailsDiv.innerHTML = `
+        <p>Email: ${details.email}</p>
+        <p>CPF: ${details.cpf}</p>
+        <p>Nome: ${details.nome}</p>
+      `;
+      document.getElementById('cpf').value = cpf;
+    }
+    loadDetails();
+  </script>
+</body>
+</html>
