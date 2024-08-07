@@ -1,3 +1,18 @@
+var mysql = require('mysql');
+
+var con = mysql.createConnection({
+  host: "bgnymdsubmecgymv1d9v-mysql.services.clever-cloud.com",
+  user: "uoz9zbjbmoc2wluj",
+  password: "noXqoLIyeVMPH1aPKFSp"
+});
+
+con.connect(function(err) {
+  if (err) throw err;
+  console.log("Connected!");
+});
+
+
+/*
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
@@ -313,3 +328,5 @@ response.json({ fulfillmentText: 'Ok!' + "\n\n" + 'Verifiquei que temos a(s) op√
 const listener = app.listen(process.env.PORT, function() {
   console.log("Your app is listening on port " + listener.address().port);
 });
+
+*/
