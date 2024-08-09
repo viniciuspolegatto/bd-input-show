@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Busca Cadastro</title>
+    <style>
+        #resultados {
+            max-height: 500px; /* Ajuste a altura conforme necessário */
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Buscar Cadastro</h1>
+
+    <input type="text" id="cpfBusca" placeholder="Digite o CPF"/>
+    <button id="botaoPesquisar">PESQUISAR</button>
+
+    <div id="resultados"></div>
+
+    <script>
+        document.querySelector("#botaoPesquisar").addEventListener("click", function() {
+            const cpf = document.querySelector("#cpfBusca").value;
+            
+            fetch(`/buscarCadastro/${cpf}`)
+                .then(response => response.json())
+                .then(data => {
+                    let html = "<ul>";
+                    data.forEach(item => {
+                        html += `<li>Nome: ${item.nome}, CPF: ${item.cpf}, Telefone: ${item.telefone}</li>`;
+                    });
+                    html += "</ul>";
+                    document.querySelector("#resultados").innerHTML = html;
+                })
+                .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>

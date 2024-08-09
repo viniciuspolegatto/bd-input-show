@@ -1,21 +1,33 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cadastro</title>
+    <title>Hello World!</title>
+    <!-- Import the webpage's stylesheet -->
+    <link rel="stylesheet" href="/style.css" />
+    <!-- Import the webpage's javascript file -->
+    <script src="bancoDeDados.js" defer></script>
 </head>
 <body>
-  <h1>Cadastro de Usuário</h1>
-  <form action="/add" method="POST">
-    <label for="email">E-mail:</label>
-    <input type="email" id="email" name="email" required><br>
-    <label for="cpf">CPF:</label>
-    <input type="text" id="cpf" name="cpf" required><br>
-    <label for="nome">Nome:</label>
-    <input type="text" id="nome" name="nome" required><br>
-    <button type="submit">Cadastrar</button>
-  </form>
-  <a href="/search.html">Buscar Cadastro</a>
+    <h1>Lista de Dados</h1>
+    
+    <input type="text" id="nomeCon" placeholder="Insira Aqui o Nome"/><p />
+    <input type="text" id="cpfCon" placeholder="CPF"/><p />
+    <input type="text" id="emailCon" placeholder="E-mail"/><p />
+    <input type="text" id="telCon" placeholder="Telefone"/><p />
+    <input type="text" id="enderecoCon" placeholder="Endereço"/><p />
+   
+    <button id="botaoAdicionarDados">ENVIAR</button>
+    <button id="botaoLimparDados">Limpar</button>
+    
+    <ul id="listaVisualDeDados"></ul>
+    
+    <!-- Adiciona o botão para acessar a página de busca -->
+    <button id="botaoBuscarCadastro">Buscar Cadastro</button>
+    
+    <script>
+        document.querySelector("#botaoBuscarCadastro").addEventListener("click", function() {
+            window.location.href = "/buscaCadastro.html";
+        });
+    </script>
 </body>
 </html>

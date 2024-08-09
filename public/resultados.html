@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Resultados</title>
+</head>
+<body>
+    <h1>Resultados da Pesquisa</h1>
+    <div id="resultados"></div>
+    
+    <script>
+        // Função para obter os parâmetros da URL
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+        
+        const cpf = getQueryParam('cpf');
+
+        fetch(`/buscarPorCpf/${cpf}`)
+            .then(response => response.json())
+            .then(data => {
+                let html = "<ul>";
+                data.forEach(item => {
+                    html += `<li>Nome: ${item.nome}, CPF: ${item.cpf}, E-mail: ${item.email}, Telefone: ${item.telefone}, Endereço: ${item.endereco}</li>`;
+                });
+                html += "</ul>";
+                document.querySelector("#resultados").innerHTML = html;
+            })
+            .catch(error => console.error('Error:', error));
+    </script>
+</body>
+</html>
