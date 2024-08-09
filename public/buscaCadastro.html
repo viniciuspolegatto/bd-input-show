@@ -9,31 +9,50 @@
             border: 1px solid #ddd;
             padding: 10px;
         }
+        #listaDados {
+            max-height: 500px; /* Ajuste a altura conforme necessário */
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
     </style>
 </head>
 <body>
     <h1>Buscar Cadastro</h1>
 
+    <!-- Área para mostrar os dados existentes -->
+    <div id="listaDados">
+        <h2>Dados Cadastrados:</h2>
+    </div>
+
     <input type="text" id="cpfBusca" placeholder="Digite o CPF"/>
     <button id="botaoPesquisar">PESQUISAR</button>
 
-    <div id="resultados"></div>
-
     <script>
-        document.querySelector("#botaoPesquisar").addEventListener("click", function() {
-            const cpf = document.querySelector("#cpfBusca").value;
-            
-            fetch(`/buscarCadastro/${cpf}`)
+        // Função para carregar dados existentes
+        function carregarDados() {
+            console.log("Carregando dados cadastrados...");
+            fetch('/buscarCadastro/')
                 .then(response => response.json())
                 .then(data => {
+                    console.log("Dados recebidos:", data);
                     let html = "<ul>";
                     data.forEach(item => {
                         html += `<li>Nome: ${item.nome}, CPF: ${item.cpf}, Telefone: ${item.telefone}</li>`;
                     });
                     html += "</ul>";
-                    document.querySelector("#resultados").innerHTML = html;
+                    document.querySelector("#listaDados").innerHTML = html;
                 })
-                .catch(error => console.error('Error:', error));
+                .catch(error => console.error('Error ao carregar dados:', error));
+        }
+
+        // Carregar dados ao iniciar a página
+        carregarDados();
+
+        document.querySelector("#botaoPesquisar").addEventListener("click", function() {
+            const cpf = document.querySelector("#cpfBusca").value;
+            console.log("Pesquisando CPF:", cpf);
+            window.location.href = `/resultados.html?cpf=${cpf}`;
         });
     </script>
 </body>
